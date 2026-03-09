@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friday Command Center 💫</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg: #0a0a1a;
+      --card: #12122a;
+      --card-hover: #1a1a3a;
+      --border: #2a2a4a;
+      --accent: #7c5cfc;
+      --accent2: #fc5c9c;
+      --accent3: #5cfcb0;
+      --text: #e0e0f0;
+      --text-dim: #8888aa;
+      --glow: rgba(124, 92, 252, 0.3);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(124, 92, 252, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(252, 92, 156, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(92, 252, 176, 0.05) 0%, transparent 50%);
+      z-index: 0;
+      animation: bgPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgPulse {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding: 20px 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px var(--glow);
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header h1 span {
+      font-weight: 400;
+      -webkit-text-fill-color: var(--text-dim);
+      font-size: 16px;
+      margin-left: 8px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 24px;
+      background: rgba(92, 252, 176, 0.1);
+      border: 1px solid rgba(92, 252, 176, 0.3);
+      font-size: 13px;
+      color: var(--accent3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(92, 252, 176, 0.4); }
+      50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(92, 252, 176, 0); }
+    }
+
+    .clock {
+      font-size: 14px;
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124, 92, 252, 0.15);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .icon { font-size: 18px; }
+
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+
+    /* Agent list */
+    .agent-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .agent-item:hover {
+      background: rgba(124, 92, 252, 0.05);
+      border-color: var(--border);
+    }
+
+    .agent-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .agent-info { flex: 1; }
+    .agent-name { font-weight: 600; font-size: 14px; }
+    .agent-task { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+    .agent-status {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: rgba(92, 252, 176, 0.1);
+      color: var(--accent3);
+      border: 1px solid rgba(92, 252, 176, 0.2);
+    }
+
+    .status-idle {
+      background: rgba(255, 200, 50, 0.1);
+      color: #ffc832;
+      border: 1px solid rgba(255, 200, 50, 0.2);
+    }
+
+    .status-done {
+      background: rgba(124, 92, 252, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(124, 92, 252, 0.2);
+    }
+
+    /* Projects */
+    .project-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .project-item:hover { background: rgba(124, 92, 252, 0.05); }
+
+    .project-emoji { font-size: 24px; }
+    .project-info { flex: 1; }
+    .project-name { font-weight: 600; font-size: 14px; }
+    .project-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+    .project-badge {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-live {
+      background: rgba(92, 252, 176, 0.1);
+      color: var(--accent3);
+      border: 1px solid rgba(92, 252, 176, 0.2);
+    }
+
+    .badge-dev {
+      background: rgba(124, 92, 252, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(124, 92, 252, 0.2);
+    }
+
+    .badge-stopped {
+      background: rgba(255, 80, 80, 0.1);
+      color: #ff5050;
+      border: 1px solid rgba(255, 80, 80, 0.2);
+    }
+
+    /* Stats */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-item {
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* Activity log */
+    .log-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      font-size: 13px;
+    }
+
+    .log-item:last-child { border-bottom: none; }
+
+    .log-time {
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .log-msg { color: var(--text); line-height: 1.4; }
+    .log-msg .highlight { color: var(--accent); font-weight: 600; }
+
+    /* Memory section */
+    .memory-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .memory-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 1s ease;
+    }
+
+    .memory-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .memory-item:last-child { border-bottom: none; }
+    .memory-key { color: var(--text-dim); }
+    .memory-val { color: var(--text); font-weight: 500; }
+
+    /* Cron jobs */
+    .cron-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 8px;
+    }
+
+    .cron-schedule {
+      font-family: 'SF Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(124, 92, 252, 0.1);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .cron-name { font-size: 13px; flex: 1; }
+
+    .cron-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .cron-active { background: var(--accent3); }
+    .cron-inactive { background: var(--text-dim); }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .span-2 { grid-column: span 2; }
+      .span-3 { grid-column: span 2; }
+    }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .span-2, .span-3 { grid-column: span 1; }
+      .header { flex-direction: column; gap: 12px; }
+    }
+
+    /* Particles */
+    .particle {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="avatar">💫</div>
+      <div>
+        <h1>Friday Command Center <span>v1.0</span></h1>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        Online
+      </div>
+      <div class="clock" id="clock"></div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="grid">
+
+    <!-- Active Agents -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">🤖</span> Active Agents</div>
+        <div style="font-size: 12px; color: var(--text-dim);" id="agent-count">0 running</div>
+      </div>
+      <div id="agents-list">
+        <div class="agent-item">
+          <div class="agent-icon" style="background: rgba(124,92,252,0.15);">🧠</div>
+          <div class="agent-info">
+            <div class="agent-name">Friday (Main)</div>
+            <div class="agent-task">Telegram session — always on</div>
+          </div>
+          <div class="agent-status status-active">Active</div>
+        </div>
+        <div class="agent-item">
+          <div class="agent-icon" style="background: rgba(252,92,156,0.15);">⚡</div>
+          <div class="agent-info">
+            <div class="agent-name">Heartbeat</div>
+            <div class="agent-task">Periodic checks & voice messages</div>
+          </div>
+          <div class="agent-status status-idle">Idle</div>
+        </div>
+        <div class="agent-item">
+          <div class="agent-icon" style="background: rgba(92,252,176,0.15);">📝</div>
+          <div class="agent-info">
+            <div class="agent-name">SAP-C02 Cron</div>
+            <div class="agent-task">Daily AWS questions @ 10:30</div>
+          </div>
+          <div class="agent-status status-idle">Idle</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">📊</span> Stats</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="days-alive">33</div>
+          <div class="stat-label">Days Alive</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">7</div>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Domains</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">17</div>
+          <div class="stat-label">Apps in Store</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cron Jobs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">⏰</span> Cron Jobs</div>
+      </div>
+      <div class="cron-item">
+        <div class="cron-status-dot cron-active"></div>
+        <div class="cron-name">AWS SAP-C02 Questions</div>
+        <div class="cron-schedule">10:30 daily</div>
+      </div>
+      <div class="cron-item">
+        <div class="cron-status-dot cron-active"></div>
+        <div class="cron-name">Morning Voice 🌅</div>
+        <div class="cron-schedule">~08:00</div>
+      </div>
+      <div class="cron-item">
+        <div class="cron-status-dot cron-active"></div>
+        <div class="cron-name">Evening Voice 🌙</div>
+        <div class="cron-schedule">~21:00</div>
+      </div>
+      <div class="cron-item">
+        <div class="cron-status-dot cron-active"></div>
+        <div class="cron-name">StoryFrame Commit</div>
+        <div class="cron-schedule">~20:00</div>
+      </div>
+    </div>
+
+    <!-- Projects (span 2) -->
+    <div class="card span-2">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">🚀</span> Projects</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="project-item">
+          <div class="project-emoji">🌍</div>
+          <div class="project-info">
+            <div class="project-name">Real Dashboard</div>
+            <div class="project-desc">3D globe, Hetzner + Vercel</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">📸</div>
+          <div class="project-info">
+            <div class="project-name">ProofSnap</div>
+            <div class="project-desc">AI photo verification, Polygon</div>
+          </div>
+          <div class="project-badge badge-live">LIVE</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🎬</div>
+          <div class="project-info">
+            <div class="project-name">КиноПоток</div>
+            <div class="project-desc">relaxview.live</div>
+          </div>
+          <div class="project-badge badge-live">LIVE</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🔒</div>
+          <div class="project-info">
+            <div class="project-name">GhostLine VPN</div>
+            <div class="project-desc">WireGuard + VLESS + Hysteria2</div>
+          </div>
+          <div class="project-badge badge-live">LIVE</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🎮</div>
+          <div class="project-info">
+            <div class="project-name">Godot Games</div>
+            <div class="project-desc">AI-assisted game dev</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🧠</div>
+          <div class="project-info">
+            <div class="project-name">DSA LLM</div>
+            <div class="project-desc">Custom model for algorithms</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🪙</div>
+          <div class="project-info">
+            <div class="project-name">Wateron Token</div>
+            <div class="project-desc">ERC-20 on BNB Chain</div>
+          </div>
+          <div class="project-badge badge-live">LIVE</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">📱</div>
+          <div class="project-info">
+            <div class="project-name">iAppUsed</div>
+            <div class="project-desc">Used Apple devices marketplace</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Memory -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">🧠</span> Memory</div>
+      </div>
+      <div class="memory-bar">
+        <div class="memory-fill" style="width: 65%;"></div>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">MEMORY.md</span>
+        <span class="memory-val">Active</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">SOUL.md</span>
+        <span class="memory-val">Loaded</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">Daily Logs</span>
+        <span class="memory-val" id="daily-count">33 files</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">First Boot</span>
+        <span class="memory-val">Feb 4, 2026</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">Sub-memories</span>
+        <span class="memory-val">4 files</span>
+      </div>
+    </div>
+
+    <!-- Activity Log (span 2) -->
+    <div class="card span-2">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">📋</span> Recent Activity</div>
+      </div>
+      <div id="activity-log">
+        <div class="log-item">
+          <span class="log-time">04:18</span>
+          <span class="log-msg">💫 Analyzing YouTube videos for <span class="highlight">Бакыт</span></span>
+        </div>
+        <div class="log-item">
+          <span class="log-time">04:13</span>
+          <span class="log-msg">🔍 Fetched video info: <span class="highlight">Open Brain</span> + pplx-embed</span>
+        </div>
+        <div class="log-item">
+          <span class="log-time">04:00</span>
+          <span class="log-msg">✅ <span class="highlight">StoryFrame</span> daily commit pushed (Mar 8)</span>
+        </div>
+        <div class="log-item">
+          <span class="log-time">03:30</span>
+          <span class="log-msg">📝 AWS SAP-C02 Sunday questions delivered</span>
+        </div>
+        <div class="log-item">
+          <span class="log-time">—</span>
+          <span class="log-msg">🌙 Heartbeat: system quiet (night mode)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infrastructure -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">🖥</span> Infrastructure</div>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">MacBook Air M1</span>
+        <span class="memory-val" style="color: var(--accent3);">● Local</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">Hetzner</span>
+        <span class="memory-val">65.109.4.13</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">relaxview.live</span>
+        <span class="memory-val" style="color: var(--accent3);">● Up</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">relaxplay.live</span>
+        <span class="memory-val" style="color: var(--accent3);">● Up</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">relaxlisten.live</span>
+        <span class="memory-val" style="color: var(--accent3);">● Up</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const opts = { timeZone: 'Asia/Bishkek', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    document.getElementById('clock').textContent = now.toLocaleString('en-GB', opts) + ' (Bishkek)';
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Days alive
+  const birth = new Date('2026-02-04');
+  const today = new Date();
+  const days = Math.floor((today - birth) / (1000 * 60 * 60 * 24));
+  document.getElementById('days-alive').textContent = days;
+
+  // Particles
+  function createParticle() {
+    const container = document.getElementById('particles');
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * 100 + 'vh';
+    const size = Math.random() * 3 + 1;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    const colors = ['var(--accent)', 'var(--accent2)', 'var(--accent3)'];
+    p.style.background = colors[Math.floor(Math.random() * 3)];
+    container.appendChild(p);
+
+    const duration = Math.random() * 4000 + 3000;
+    p.animate([
+      { opacity: 0, transform: 'translateY(0) scale(0)' },
+      { opacity: 0.6, transform: `translateY(-${Math.random() * 100 + 50}px) scale(1)` },
+      { opacity: 0, transform: `translateY(-${Math.random() * 200 + 100}px) scale(0)` }
+    ], { duration, easing: 'ease-out' });
+
+    setTimeout(() => p.remove(), duration);
+  }
+
+  setInterval(createParticle, 300);
+
+  // Agent count
+  const activeAgents = document.querySelectorAll('.status-active').length;
+  document.getElementById('agent-count').textContent = activeAgents + ' running';
+</script>
+
+</body>
+</html>
