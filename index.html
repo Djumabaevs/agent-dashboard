@@ -28,7 +28,6 @@
       overflow-x: hidden;
     }
 
-    /* Animated background */
     body::before {
       content: '';
       position: fixed;
@@ -54,7 +53,6 @@
       padding: 24px;
     }
 
-    /* Header */
     .header {
       display: flex;
       align-items: center;
@@ -131,7 +129,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -158,9 +155,7 @@
     .card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 3px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       opacity: 0;
@@ -192,7 +187,6 @@
     .span-2 { grid-column: span 2; }
     .span-3 { grid-column: span 3; }
 
-    /* Agent list */
     .agent-item {
       display: flex;
       align-items: center;
@@ -245,13 +239,18 @@
       border: 1px solid rgba(255, 200, 50, 0.2);
     }
 
+    .status-error {
+      background: rgba(255, 80, 80, 0.1);
+      color: #ff5050;
+      border: 1px solid rgba(255, 80, 80, 0.2);
+    }
+
     .status-done {
       background: rgba(124, 92, 252, 0.1);
       color: var(--accent);
       border: 1px solid rgba(124, 92, 252, 0.2);
     }
 
-    /* Projects */
     .project-item {
       display: flex;
       align-items: center;
@@ -295,7 +294,6 @@
       border: 1px solid rgba(255, 80, 80, 0.2);
     }
 
-    /* Stats */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -325,7 +323,6 @@
       margin-top: 4px;
     }
 
-    /* Activity log */
     .log-item {
       display: flex;
       align-items: flex-start;
@@ -347,7 +344,6 @@
     .log-msg { color: var(--text); line-height: 1.4; }
     .log-msg .highlight { color: var(--accent); font-weight: 600; }
 
-    /* Memory section */
     .memory-bar {
       height: 8px;
       border-radius: 4px;
@@ -375,7 +371,6 @@
     .memory-key { color: var(--text-dim); }
     .memory-val { color: var(--text); font-weight: 500; }
 
-    /* Cron jobs */
     .cron-item {
       display: flex;
       align-items: center;
@@ -404,9 +399,20 @@
     }
 
     .cron-active { background: var(--accent3); }
-    .cron-inactive { background: var(--text-dim); }
+    .cron-error { background: #ff5050; }
 
-    /* Responsive */
+    .infra-status {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+
+    .infra-up { background: var(--accent3); }
+    .infra-down { background: #ff5050; }
+    .infra-warn { background: #ffc832; }
+
     @media (max-width: 1024px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
       .span-2 { grid-column: span 2; }
@@ -419,7 +425,6 @@
       .header { flex-direction: column; gap: 12px; }
     }
 
-    /* Particles */
     .particle {
       position: fixed;
       width: 2px;
@@ -434,7 +439,6 @@
 </head>
 <body>
 
-<!-- Floating particles -->
 <div id="particles"></div>
 
 <div class="container">
@@ -443,7 +447,7 @@
     <div class="header-left">
       <div class="avatar">💫</div>
       <div>
-        <h1>Friday Command Center <span>v1.0</span></h1>
+        <h1>Friday Command Center <span>v2.0</span></h1>
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 16px;">
@@ -479,13 +483,29 @@
             <div class="agent-name">Heartbeat</div>
             <div class="agent-task">Periodic checks & voice messages</div>
           </div>
-          <div class="agent-status status-idle">Idle</div>
+          <div class="agent-status status-active">Active</div>
         </div>
         <div class="agent-item">
           <div class="agent-icon" style="background: rgba(92,252,176,0.15);">📝</div>
           <div class="agent-info">
             <div class="agent-name">SAP-C02 Cron</div>
             <div class="agent-task">Daily AWS questions @ 10:30</div>
+          </div>
+          <div class="agent-status status-idle">Idle</div>
+        </div>
+        <div class="agent-item">
+          <div class="agent-icon" style="background: rgba(255,200,50,0.15);">📱</div>
+          <div class="agent-info">
+            <div class="agent-name">App Store Monitor</div>
+            <div class="agent-task">Daily check @ 16:00</div>
+          </div>
+          <div class="agent-status status-idle">Idle</div>
+        </div>
+        <div class="agent-item">
+          <div class="agent-icon" style="background: rgba(92,200,252,0.15);">🔄</div>
+          <div class="agent-info">
+            <div class="agent-name">GitHub Daily Commit</div>
+            <div class="agent-task">StoryFrame auto-commit</div>
           </div>
           <div class="agent-status status-idle">Idle</div>
         </div>
@@ -499,11 +519,11 @@
       </div>
       <div class="stat-grid">
         <div class="stat-item">
-          <div class="stat-value" id="days-alive">33</div>
+          <div class="stat-value" id="days-alive">0</div>
           <div class="stat-label">Days Alive</div>
         </div>
         <div class="stat-item">
-          <div class="stat-value">7</div>
+          <div class="stat-value">13</div>
           <div class="stat-label">Projects</div>
         </div>
         <div class="stat-item">
@@ -521,26 +541,27 @@
     <div class="card">
       <div class="card-header">
         <div class="card-title"><span class="icon">⏰</span> Cron Jobs</div>
+        <div style="font-size: 12px; color: var(--text-dim);">4 jobs</div>
       </div>
       <div class="cron-item">
         <div class="cron-status-dot cron-active"></div>
         <div class="cron-name">AWS SAP-C02 Questions</div>
+        <div class="cron-schedule">04:30 UTC daily</div>
+      </div>
+      <div class="cron-item">
+        <div class="cron-status-dot cron-error"></div>
+        <div class="cron-name">AWS SAP-C02 (Bishkek)</div>
         <div class="cron-schedule">10:30 daily</div>
       </div>
       <div class="cron-item">
-        <div class="cron-status-dot cron-active"></div>
-        <div class="cron-name">Morning Voice 🌅</div>
-        <div class="cron-schedule">~08:00</div>
+        <div class="cron-status-dot cron-error"></div>
+        <div class="cron-name">App Store Monitor</div>
+        <div class="cron-schedule">16:00 daily</div>
       </div>
       <div class="cron-item">
         <div class="cron-status-dot cron-active"></div>
-        <div class="cron-name">Evening Voice 🌙</div>
-        <div class="cron-schedule">~21:00</div>
-      </div>
-      <div class="cron-item">
-        <div class="cron-status-dot cron-active"></div>
-        <div class="cron-name">StoryFrame Commit</div>
-        <div class="cron-schedule">~20:00</div>
+        <div class="cron-name">GitHub Daily Commit (StoryFrame)</div>
+        <div class="cron-schedule">every 1d</div>
       </div>
     </div>
 
@@ -548,6 +569,7 @@
     <div class="card span-2">
       <div class="card-header">
         <div class="card-title"><span class="icon">🚀</span> Projects</div>
+        <div style="font-size: 12px; color: var(--text-dim);">5 live · 7 dev · 1 stopped</div>
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div class="project-item">
@@ -556,13 +578,13 @@
             <div class="project-name">Real Dashboard</div>
             <div class="project-desc">3D globe, Hetzner + Vercel</div>
           </div>
-          <div class="project-badge badge-dev">DEV</div>
+          <div class="project-badge badge-live">LIVE</div>
         </div>
         <div class="project-item">
           <div class="project-emoji">📸</div>
           <div class="project-info">
             <div class="project-name">ProofSnap</div>
-            <div class="project-desc">AI photo verification, Polygon</div>
+            <div class="project-desc">AI photo verification, Polygon mainnet</div>
           </div>
           <div class="project-badge badge-live">LIVE</div>
         </div>
@@ -570,7 +592,7 @@
           <div class="project-emoji">🎬</div>
           <div class="project-info">
             <div class="project-name">КиноПоток</div>
-            <div class="project-desc">relaxview.live</div>
+            <div class="project-desc">relaxview.live — movies & series</div>
           </div>
           <div class="project-badge badge-live">LIVE</div>
         </div>
@@ -579,6 +601,14 @@
           <div class="project-info">
             <div class="project-name">GhostLine VPN</div>
             <div class="project-desc">WireGuard + VLESS + Hysteria2</div>
+          </div>
+          <div class="project-badge badge-live">LIVE</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🪙</div>
+          <div class="project-info">
+            <div class="project-name">Wateron Token</div>
+            <div class="project-desc">ERC-20 on BNB Chain</div>
           </div>
           <div class="project-badge badge-live">LIVE</div>
         </div>
@@ -599,20 +629,52 @@
           <div class="project-badge badge-dev">DEV</div>
         </div>
         <div class="project-item">
-          <div class="project-emoji">🪙</div>
+          <div class="project-emoji">🤖</div>
           <div class="project-info">
-            <div class="project-name">Wateron Token</div>
-            <div class="project-desc">ERC-20 on BNB Chain</div>
+            <div class="project-name">Qwen3.5 Local</div>
+            <div class="project-desc">Local AI model, 262K context</div>
           </div>
-          <div class="project-badge badge-live">LIVE</div>
+          <div class="project-badge badge-dev">DEV</div>
         </div>
         <div class="project-item">
           <div class="project-emoji">📱</div>
           <div class="project-info">
             <div class="project-name">iAppUsed</div>
-            <div class="project-desc">Used Apple devices marketplace</div>
+            <div class="project-desc">Used Apple devices, Firebase</div>
           </div>
           <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">📷</div>
+          <div class="project-info">
+            <div class="project-name">Фото на документы</div>
+            <div class="project-desc">PWA passport photo tool</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🗳️</div>
+          <div class="project-info">
+            <div class="project-name">VoteChain</div>
+            <div class="project-desc">Custom L1 blockchain</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">🗳️</div>
+          <div class="project-info">
+            <div class="project-name">Blockchain Voting</div>
+            <div class="project-desc">DApp on Hardhat</div>
+          </div>
+          <div class="project-badge badge-dev">DEV</div>
+        </div>
+        <div class="project-item">
+          <div class="project-emoji">💻</div>
+          <div class="project-info">
+            <div class="project-name">AlgoApp</div>
+            <div class="project-desc">LeetCode + Blockchain + AI Judge</div>
+          </div>
+          <div class="project-badge badge-stopped">STOPPED</div>
         </div>
       </div>
     </div>
@@ -623,7 +685,7 @@
         <div class="card-title"><span class="icon">🧠</span> Memory</div>
       </div>
       <div class="memory-bar">
-        <div class="memory-fill" style="width: 65%;"></div>
+        <div class="memory-fill" style="width: 72%;"></div>
       </div>
       <div class="memory-item">
         <span class="memory-key">MEMORY.md</span>
@@ -635,7 +697,7 @@
       </div>
       <div class="memory-item">
         <span class="memory-key">Daily Logs</span>
-        <span class="memory-val" id="daily-count">33 files</span>
+        <span class="memory-val" id="daily-count">26 files</span>
       </div>
       <div class="memory-item">
         <span class="memory-key">First Boot</span>
@@ -643,7 +705,11 @@
       </div>
       <div class="memory-item">
         <span class="memory-key">Sub-memories</span>
-        <span class="memory-val">4 files</span>
+        <span class="memory-val">6 files</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">Sub-files</span>
+        <span class="memory-val" style="font-size:11px;">personal, projects, crypto, infra, video-guide</span>
       </div>
     </div>
 
@@ -651,27 +717,28 @@
     <div class="card span-2">
       <div class="card-header">
         <div class="card-title"><span class="icon">📋</span> Recent Activity</div>
+        <div style="font-size: 12px; color: var(--text-dim);">Mar 10, 2026</div>
       </div>
       <div id="activity-log">
         <div class="log-item">
-          <span class="log-time">04:18</span>
-          <span class="log-msg">💫 Analyzing YouTube videos for <span class="highlight">Бакыт</span></span>
+          <span class="log-time">13:42</span>
+          <span class="log-msg">🔧 Fixing <span class="highlight">agent-dashboard</span> inaccurate data</span>
+        </div>
+        <div class="log-item">
+          <span class="log-time">13:23</span>
+          <span class="log-msg">🎬 Fixed <span class="highlight">КиноПоток</span> — fresh episodes & new series filters</span>
+        </div>
+        <div class="log-item">
+          <span class="log-time">08:13</span>
+          <span class="log-msg">🌅 Morning voice message sent to <span class="highlight">Бакыт</span></span>
         </div>
         <div class="log-item">
           <span class="log-time">04:13</span>
-          <span class="log-msg">🔍 Fetched video info: <span class="highlight">Open Brain</span> + pplx-embed</span>
-        </div>
-        <div class="log-item">
-          <span class="log-time">04:00</span>
-          <span class="log-msg">✅ <span class="highlight">StoryFrame</span> daily commit pushed (Mar 8)</span>
-        </div>
-        <div class="log-item">
-          <span class="log-time">03:30</span>
-          <span class="log-msg">📝 AWS SAP-C02 Sunday questions delivered</span>
+          <span class="log-msg">📝 AWS SAP-C02 questions: Data Lakes & DR Multi-Region</span>
         </div>
         <div class="log-item">
           <span class="log-time">—</span>
-          <span class="log-msg">🌙 Heartbeat: system quiet (night mode)</span>
+          <span class="log-msg">📹 Yesterday: ProofSnap YouTube Short published on <span class="highlight">InsideOutDiscovery</span></span>
         </div>
       </div>
     </div>
@@ -683,23 +750,31 @@
       </div>
       <div class="memory-item">
         <span class="memory-key">MacBook Air M1</span>
-        <span class="memory-val" style="color: var(--accent3);">● Local</span>
+        <span class="memory-val"><span class="infra-status infra-up"></span> Local</span>
       </div>
       <div class="memory-item">
         <span class="memory-key">Hetzner</span>
-        <span class="memory-val">65.109.4.13</span>
+        <span class="memory-val"><span class="infra-status infra-up"></span> 65.109.4.13</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">Hetzner Uptime</span>
+        <span class="memory-val" id="hetzner-uptime">21+ days</span>
       </div>
       <div class="memory-item">
         <span class="memory-key">relaxview.live</span>
-        <span class="memory-val" style="color: var(--accent3);">● Up</span>
+        <span class="memory-val"><span class="infra-status infra-up"></span> 200 OK</span>
       </div>
       <div class="memory-item">
         <span class="memory-key">relaxplay.live</span>
-        <span class="memory-val" style="color: var(--accent3);">● Up</span>
+        <span class="memory-val"><span class="infra-status infra-warn"></span> 307 Redirect</span>
       </div>
       <div class="memory-item">
         <span class="memory-key">relaxlisten.live</span>
-        <span class="memory-val" style="color: var(--accent3);">● Up</span>
+        <span class="memory-val"><span class="infra-status infra-down"></span> 404</span>
+      </div>
+      <div class="memory-item">
+        <span class="memory-key">Services on Hetzner</span>
+        <span class="memory-val" style="font-size:11px;">reallife, proofsnap, votechaind, nginx</span>
       </div>
     </div>
 
@@ -716,10 +791,10 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  // Days alive
-  const birth = new Date('2026-02-04');
-  const today = new Date();
-  const days = Math.floor((today - birth) / (1000 * 60 * 60 * 24));
+  // Days alive (born Feb 4, 2026)
+  const birth = new Date('2026-02-04T00:00:00+06:00');
+  const now = new Date();
+  const days = Math.floor((now - birth) / (1000 * 60 * 60 * 24));
   document.getElementById('days-alive').textContent = days;
 
   // Particles
